@@ -52,7 +52,7 @@ build_cpp_framework(){
 
 		mysql -h${DBIP} -P${DBPort} -u${DBUser} -p${DBPassword} -e "USE db_tars; UPDATE t_adapter_conf SET node_name=REPLACE(node_name, '${OLDIP}', '${MachineIp}'), endpoint=REPLACE(endpoint,'${OLDIP}', '${MachineIp}'); UPDATE t_machine_tars_info SET node_name=REPLACE(node_name, '${OLDIP}', '${MachineIp}'); UPDATE t_server_conf SET node_name=REPLACE(node_name, '${OLDIP}', '${MachineIp}'); UPDATE t_server_notifys SET node_name=REPLACE(node_name, '${OLDIP}', '${MachineIp}'), server_id=REPLACE(server_id, '${OLDIP}', '${MachineIp}'); DELETE FROM t_node_info WHERE node_name='${OLDIP}'; DELETE FROM t_registry_info WHERE locator_id LIKE '${OLDIP}:%';"
 
-		sed -i "s/${OLDIP}/${MachineIp}/g" `find /data/tarsnode_data/ -name *.conf|xargs grep ${OLDIP}  -rl`
+		sed -i "s/${OLDIP}/${MachineIp}/g" `grep ${OLDIP} -rl /data/tarsnode_data/*`
 
 	else
 
@@ -145,15 +145,15 @@ install_base_services(){
 
 	##核心基础服务配置修改
 	cd /usr/local/app/tars
-	CONF_LIST=`find /usr/local/app/tars -name *.conf`
-	sed -i "s/dbhost.*=.*192.168.2.131/dbhost = ${DBIP}/g" `echo ${CONF_LIST}|xargs grep dbhost  -rl`
-	sed -i "s/192.168.2.131/${MachineIp}/g" `echo ${CONF_LIST}|xargs grep 192.168.2.131  -rl`
-	sed -i "s/db.tars.com/${DBIP}/g" `echo ${CONF_LIST}|xargs grep db.tars.com  -rl`
-	sed -i "s/dbport.*=.*3306/dbport = ${DBPort}/g" `echo ${CONF_LIST}|xargs grep dbport  -rl`
-	sed -i "s/registry.tars.com/${MachineIp}/g" `echo ${CONF_LIST}|xargs grep registry.tars.com  -rl`
-	sed -i "s/web.tars.com/${MachineIp}/g" `echo ${CONF_LIST}|xargs grep web.tars.com  -rl`
+
+	sed -i "s/dbhost.*=.*192.168.2.131/dbhost = ${DBIP}/g" `grep dbhost -rl ./*`
+	sed -i "s/192.168.2.131/${MachineIp}/g" `grep 192.168.2.131 -rl ./*`
+	sed -i "s/db.tars.com/${DBIP}/g" `grep db.tars.com -rl ./*`
+	sed -i "s/dbport.*=.*3306/dbport = ${DBPort}/g" `grep dbport -rl /usr/local/app/tars/*`
+	sed -i "s/registry.tars.com/${MachineIp}/g" `grep registry.tars.com -rl ./*`
+	sed -i "s/web.tars.com/${MachineIp}/g" `grep web.tars.com -rl ./*`
 	# 修改Mysql里tars用户密码
-	sed -i "s/tars2015/${DBTarsPass}/g" `echo ${CONF_LIST}|xargs grep tars2015  -rl`
+	sed -i "s/tars2015/${DBTarsPass}/g" `grep tars2015 -rl ./*`
 
 	#mysql -h${DBIP} -P${DBPort} -u${DBUser} -p${DBPassword} -e "USE db_tars; INSERT INTO t_adapter_conf (id, application, server_name, node_name, adapter_name, registry_timestamp, thread_num, endpoint, max_connections, allow_ip, servant, queuecap, queuetimeout, posttime, lastuser, protocol, handlegroup) VALUES (23, 'tars', 'tarsstat', '${MachineIp}', 'tars.tarsstat.StatObjAdapter', '2018-05-27 12:22:05', 5, 'tcp -h ${MachineIp} -t 60000 -p 10003 -e 0', 200000, '', 'tars.tarsstat.StatObj', 10000, 60000, '2018-05-27 20:22:05', NULL, 'tars', ''),(24, 'tars', 'tarsproperty', '${MachineIp}', 'tars.tarsproperty.PropertyObjAdapter', '2018-05-27 12:22:24', 5, 'tcp -h ${MachineIp} -t 60000 -p 10004 -e 0', 200000, '', 'tars.tarsproperty.PropertyObj', 10000, 60000, '2018-05-27 20:22:24', NULL, 'tars', ''),(25, 'tars', 'tarslog', '${MachineIp}', 'tars.tarslog.LogObjAdapter', '2018-05-27 12:22:43', 5, 'tcp -h ${MachineIp} -t 60000 -p 10005 -e 0', 200000, '', 'tars.tarslog.LogObj', 10000, 60000, '2018-05-27 20:22:43', NULL, 'tars', ''),(26, 'tars', 'tarsquerystat', '${MachineIp}', 'tars.tarsquerystat.NoTarsObjAdapter', '2018-05-27 12:23:08', 5, 'tcp -h ${MachineIp} -t 60000 -p 10006 -e 0', 200000, '', 'tars.tarsquerystat.NoTarsObj', 10000, 60000, '2018-05-27 20:23:08', NULL, 'not_tars', ''),(27, 'tars', 'tarsqueryproperty', '${MachineIp}', 'tars.tarsqueryproperty.NoTarsObjAdapter', '2018-05-27 12:23:22', 5, 'tcp -h ${MachineIp} -t 60000 -p 10007 -e 0', 200000, '', 'tars.tarsqueryproperty.NoTarsObj', 10000, 60000, '2018-05-27 20:23:22', NULL, 'not_tars', '');"
 
